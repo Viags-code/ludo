@@ -21,7 +21,17 @@ photos:
 La description affichée sur la fiche.
 ```
 
-Les photos vont dans `public/uploads/`. Une page d'administration (`/admin`) permettra bientôt à Ludo de faire tout ça depuis son téléphone, sans toucher aux fichiers.
+Les photos vont dans `public/uploads/`.
+
+## Espace Ludo (`/admin`)
+
+Ludo ajoute, modifie ou marque comme vendu ses articles depuis son téléphone à l'adresse `https://<le-site>/admin`. Il y modifie aussi ses coordonnées. L'éditeur est [Sveltia CMS](https://github.com/sveltia/sveltia-cms), configuré dans `public/admin/config.yml`. Chaque « Publier » enregistre le fichier dans ce dépôt, puis Netlify remet le site en ligne en une minute environ.
+
+Mise en place, une seule fois, après la première mise en ligne sur Netlify :
+
+1. **Créer une application OAuth GitHub** : GitHub › Settings › Developer settings › OAuth Apps › New OAuth App. *Homepage URL* : l'adresse du site. *Authorization callback URL* : `https://api.netlify.com/auth/done`. Noter le *Client ID* et générer un *Client secret*.
+2. **Brancher GitHub sur Netlify** : dans le site Netlify, Site configuration › Access & security › OAuth › Install provider › GitHub, puis coller le Client ID et le secret.
+3. **Donner accès à Ludo** : il crée un compte GitHub gratuit, puis on l'invite sur ce dépôt (Settings › Collaborators). Ensuite il se connecte sur `/admin` avec « Sign In with GitHub ».
 
 ## Coordonnées
 

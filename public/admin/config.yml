@@ -1,0 +1,67 @@
+# Configuration de l'espace d'administration (/admin).
+# Ludo se connecte avec son compte GitHub. Chaque « Publier » enregistre
+# l'article dans le dépôt, et Netlify remet le site en ligne en une minute environ.
+backend:
+  name: github
+  repo: Viags-code/ludo
+  branch: main
+  commit_messages:
+    create: "Ajouter « {{slug}} »"
+    update: "Modifier « {{slug}} »"
+    delete: "Supprimer « {{slug}} »"
+    uploadMedia: "Ajouter la photo {{path}}"
+    deleteMedia: "Supprimer la photo {{path}}"
+
+locale: fr
+media_folder: public/uploads
+public_folder: /uploads
+
+collections:
+  - name: articles
+    label: Réalisations
+    label_singular: Réalisation
+    description: Chaque réalisation apparaît dans la grille de photos du site.
+    folder: src/content/articles
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    identifier_field: titre
+    summary: "{{titre}}"
+    sortable_fields: [date, titre, prix]
+    preview_path: "articles/{{slug}}"
+    fields:
+      - name: photos
+        label: Photos
+        hint: La première photo sert de vignette dans la grille.
+        widget: list
+        field: { name: photo, label: Photo, widget: image }
+        required: false
+      - { name: titre, label: Titre, widget: string }
+      - name: prix
+        label: Prix (€)
+        hint: Laisser vide pour afficher « Sur devis ».
+        widget: number
+        value_type: int
+        min: 0
+        required: false
+      - { name: vendu, label: Déjà vendu, widget: boolean, default: false }
+      - { name: bois, label: Bois, hint: "Exemple : chêne massif", widget: string, required: false }
+      - { name: dimensions, label: Dimensions, hint: "Exemple : 120 × 60 × 45 cm", widget: string, required: false }
+      - { name: date, label: Date, widget: datetime, time_format: false, date_format: "DD/MM/YYYY", format: "YYYY-MM-DD", default: "{{now}}" }
+      - { name: body, label: Description, widget: markdown, buttons: [bold, italic, bulleted-list], editor_components: [] }
+
+  - name: reglages
+    label: Coordonnées
+    files:
+      - name: site
+        label: Coordonnées et présentation
+        file: src/data/site.json
+        fields:
+          - { name: nom, label: Nom affiché, widget: string }
+          - { name: metier, label: Métier, widget: string }
+          - { name: ville, label: Ville, widget: string }
+          - { name: telephone, label: Téléphone, hint: "Fait apparaître le bouton Appeler", widget: string, required: false }
+          - { name: whatsapp, label: Numéro WhatsApp, hint: "Laisser vide si pas de WhatsApp (le bouton proposera un SMS)", widget: string, required: false }
+          - { name: email, label: E-mail, widget: string, required: false }
+          - { name: facebook, label: Lien de la page Facebook, widget: string, required: false }
+          - { name: presentation, label: Présentation courte, hint: "Une phrase, utilisée pour Google et le partage sur les réseaux", widget: text }
