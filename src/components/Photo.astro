@@ -1,0 +1,10 @@
+---
+// Affiche une photo, ou un aplat couleur bois si l'article n'a pas encore de photo.
+import Icone from './Icone.astro';
+import { teinte } from '../lib/format';
+interface Props { src?: string; alt: string; graine: string; chargement?: 'lazy' | 'eager' }
+const { src, alt, graine, chargement = 'lazy' } = Astro.props;
+---
+{src
+  ? <img src={src} alt={alt} loading={chargement} decoding="async" />
+  : <div style={`background:${teinte(graine)};width:100%;height:100%;display:flex;align-items:center;justify-content:center`} role="img" aria-label={`${alt} (photo à venir)`}><Icone nom="photo" taille={32} /></div>}

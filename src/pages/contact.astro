@@ -1,0 +1,64 @@
+---
+import Base from '../layouts/Base.astro';
+import Icone from '../components/Icone.astro';
+import site from '../data/site.json';
+import { numeroInternational } from '../lib/format';
+
+const tel = site.telephone ? numeroInternational(site.telephone) : '';
+const whatsapp = site.whatsapp ? numeroInternational(site.whatsapp).replace('+', '') : '';
+const lienMessage = whatsapp ? `https://wa.me/${whatsapp}` : tel ? `sms:${tel}` : '';
+---
+<Base titre="Contact" description={`Contacter ${site.nom}, ${site.metier.toLowerCase()} à ${site.ville}.`}>
+  <main class="conteneur contact">
+    <a class="bouton-rond" href="/" aria-label="Retour aux réalisations"><Icone nom="retour" /></a>
+    <div>
+      <h1>Contacter Ludo</h1>
+      <p class="intro">Une pièce vous plaît, ou vous avez un projet sur mesure ? Ludo vous répond directement.</p>
+    </div>
+
+    {(tel || lienMessage) && (
+      <>
+        <div class="actions">
+          {tel && <a class="bouton plein" href={`tel:${tel}`}><Icone nom="tel" taille={18} />Appeler</a>}
+          {lienMessage && <a class="bouton contour" href={lienMessage} data-message><Icone nom="message" taille={18} />{whatsapp ? 'WhatsApp' : 'SMS'}</a>}
+        </div>
+        <div class="separateur">ou écrivez-lui</div>
+      </>
+    )}
+
+    <form name="contact" method="POST" action="/merci" data-netlify="true" netlify-honeypot="site-web">
+      <input type="hidden" name="form-name" value="contact" />
+      <p class="cache"><label>Ne pas remplir <input name="site-web" tabindex="-1" autocomplete="off" /></label></p>
+      <label>Votre nom
+        <input type="text" name="nom" autocomplete="name" required />
+      </label>
+      <label>Téléphone ou e-mail
+        <input type="text" name="coordonnees" autocomplete="email" required />
+      </label>
+      <label>Votre message
+        <textarea name="message" required></textarea>
+      </label>
+      <input type="hidden" name="article" />
+      <button class="bouton sombre" type="submit">Envoyer</button>
+    </form>
+
+    <p class="pied">
+      {site.ville}
+      {site.telephone && <> · <a href={`tel:${tel}`}>{site.telephone}</a></>}
+      {site.facebook && <> · <a href={site.facebook} rel="noopener">Page Facebook</a></>}
+    </p>
+  </main>
+</Base>
+
+<script>
+  // Pré-remplit le message quand on arrive depuis la fiche d'un article.
+  const article = new URLSearchParams(location.search).get('article');
+  if (article) {
+    const message = document.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
+    const champ = document.querySelector<HTMLInputElement>('input[name="article"]');
+    if (message && !message.value) message.value = `Bonjour, je suis intéressé par « ${article} ».`;
+    if (champ) champ.value = article;
+    const lien = document.querySelector<HTMLAnchorElement>('[data-message]');
+    if (lien?.href.startsWith('https://wa.me/')) lien.href += `?text=${encodeURIComponent(`Bonjour, je suis intéressé par « ${article} ».`)}`;
+  }
+</script>
