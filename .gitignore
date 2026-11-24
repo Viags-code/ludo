@@ -1,4 +1,8 @@
 node_modules/
 dist/
-.astro/
 .DS_Store
+# Données et réglages créés sur le serveur : jamais dans Git
+public/api/config.php
+public/api/donnees/*
+!public/api/donnees/.htaccess
+public/uploads/

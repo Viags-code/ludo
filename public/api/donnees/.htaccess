@@ -1,0 +1,2 @@
+# Les fichiers de données ne sont jamais servis directement.
+Require all denied

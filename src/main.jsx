@@ -1,0 +1,54 @@
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter, Outlet, Route, Routes, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { FournisseurDonnees } from './donnees';
+import Accueil from './pages/Accueil';
+import Fiche from './pages/Fiche';
+import Contact from './pages/Contact';
+import Merci from './pages/Merci';
+import Introuvable from './pages/Introuvable';
+import MentionsLegales from './pages/MentionsLegales';
+import Admin from './pages/admin/Admin';
+import EnTete from './components/EnTete';
+import './styles.css';
+
+// Revient en haut de la page à chaque changement d'adresse.
+function HautDePage() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
+// Pages publiques : toutes ont l'en-tête fixe.
+function PagesPubliques() {
+  return (
+    <>
+      <EnTete />
+      <Outlet />
+    </>
+  );
+}
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <BrowserRouter>
+      <FournisseurDonnees>
+        <HautDePage />
+        <Routes>
+          <Route element={<PagesPubliques />}>
+            <Route path="/" element={<Accueil />} />
+            <Route path="/articles/:id" element={<Fiche />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/merci" element={<Merci />} />
+            <Route path="/mentions-legales" element={<MentionsLegales />} />
+            <Route path="*" element={<Introuvable />} />
+          </Route>
+          <Route path="/admin/*" element={<Admin />} />
+        </Routes>
+      </FournisseurDonnees>
+    </BrowserRouter>
+  </StrictMode>
+);
