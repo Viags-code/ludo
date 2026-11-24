@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import Icone from './Icone';
+import { useEffect, useRef } from 'react';
 
 // Vidéo de présentation, hébergée avec le site (public/video/atelier.mp4).
 // Pour la changer : remplacer ce fichier (MP4 en H.264, idéalement moins de 10 Mo)
@@ -7,9 +6,8 @@ import Icone from './Icone';
 const VIDEO = '/video/atelier.mp4';
 const APERCU = '/video/atelier.jpg';
 
-// Bouton de l'en-tête qui ouvre la vidéo dans une fenêtre au-dessus du site.
-export default function Video() {
-  const [ouverte, setOuverte] = useState(false);
+// Fenêtre qui affiche la vidéo au-dessus du site. Ouverte depuis le menu.
+export default function FenetreVideo({ ouverte, onFermer }) {
   const fenetre = useRef(null);
   const lecteur = useRef(null);
 
@@ -29,29 +27,23 @@ export default function Video() {
   }, [ouverte]);
 
   return (
-    <>
-      <button type="button" className="bouton-rond" onClick={() => setOuverte(true)} aria-label="Voir la vidéo de présentation">
-        <Icone nom="video" />
-      </button>
-
-      <dialog
-        ref={fenetre}
-        className="fenetre-video"
-        onClose={() => setOuverte(false)}
-        onClick={(e) => e.target === fenetre.current && setOuverte(false)}
-        aria-label="Vidéo de présentation"
-      >
-        <div className="video-cadre">
-          {ouverte && (
-            <video ref={lecteur} src={VIDEO} poster={APERCU} controls playsInline preload="metadata">
-              Votre navigateur ne peut pas lire cette vidéo.
-            </video>
-          )}
-        </div>
-        <div className="video-pied">
-          <button type="button" className="bouton contour" onClick={() => setOuverte(false)}>Fermer</button>
-        </div>
-      </dialog>
-    </>
+    <dialog
+      ref={fenetre}
+      className="fenetre-video"
+      onClose={onFermer}
+      onClick={(e) => e.target === fenetre.current && onFermer()}
+      aria-label="Vidéo de présentation"
+    >
+      <div className="video-cadre">
+        {ouverte && (
+          <video ref={lecteur} src={VIDEO} poster={APERCU} controls playsInline preload="metadata">
+            Votre navigateur ne peut pas lire cette vidéo.
+          </video>
+        )}
+      </div>
+      <div className="video-pied">
+        <button type="button" className="bouton contour" onClick={onFermer}>Fermer</button>
+      </div>
+    </dialog>
   );
 }

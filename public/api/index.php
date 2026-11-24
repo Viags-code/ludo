@@ -79,6 +79,12 @@ function siteParDefaut(): array
         // Afficher le bouton qui lance la vidéo /video/atelier.mp4
         'video' => true,
         'presentation' => 'Meubles et créations en bois, pièces uniques et sur mesure.',
+        // Informations légales (menu et page Mentions légales)
+        'entreprise' => '',
+        'statut' => '',
+        'siret' => '',
+        'adresse' => '',
+        'email' => '',
     ];
 }
 
@@ -285,6 +291,8 @@ switch ($action) {
                 ? (bool) ($d[$cle] ?? $defaut)
                 : texte($d[$cle] ?? $defaut, $cle === 'presentation' ? 300 : 120);
         }
+        if ($site['email'] !== '' && !filter_var($site['email'], FILTER_VALIDATE_EMAIL)) erreur("L'adresse e-mail n'est pas valide.");
+        if ($site['siret'] !== '' && !preg_match('/^\d{14}$/', str_replace(' ', '', $site['siret']))) erreur('Le SIRET doit contenir 14 chiffres.');
         if ($site['facebook'] !== '' && !preg_match('#^https://#', $site['facebook'])) erreur('Le lien Facebook doit commencer par https://');
         ecrireJson('site', $site);
         repondre(['site' => $site]);

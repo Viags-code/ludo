@@ -1,14 +1,11 @@
 import { Link } from 'react-router-dom';
-import Icone from './Icone';
-import Video from './Video';
+import Menu from './Menu';
 import { useDonnees } from '../donnees';
-import { numeroInternational } from '../format';
 
-// En-tête fixe en haut de chaque page : logo, nom, bouton téléphone.
+// En-tête fixe en haut de chaque page : logo, nom, menu ☰.
 // Pour changer de logo, remplacer public/logo.svg (ou mettre logo.png et changer le src ci-dessous).
 export default function EnTete() {
   const { site } = useDonnees();
-  const telephone = site?.telephone ? numeroInternational(site.telephone) : '';
   const sousTitre = [site?.metier, site?.ville].filter(Boolean).join(', ');
 
   return (
@@ -21,14 +18,7 @@ export default function EnTete() {
             {sousTitre && <span className="sous-titre">{sousTitre}</span>}
           </span>
         </Link>
-        <div className="bandeau-actions">
-        {site?.video && <Video />}
-        {telephone ? (
-          <a className="bouton-rond plein" href={`tel:${telephone}`} aria-label="Appeler Ludo"><Icone nom="tel" /></a>
-        ) : (
-          <Link className="bouton-rond plein" to="/contact" aria-label="Contacter Ludo"><Icone nom="tel" /></Link>
-        )}
-        </div>
+        <Menu site={site} />
       </div>
     </header>
   );

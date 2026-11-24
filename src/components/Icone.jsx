@@ -16,6 +16,10 @@ const chemins = {
     </>
   ),
   video: <path d="M8 5.5v13l11-6.5z" />,
+  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
+  info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>,
+  maison: <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" />,
+  enveloppe: <><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></>,
   plus: <path d="M12 5v14M5 12h14" />,
   fermer: <path d="M18 6L6 18M6 6l12 12" />,
   gauche: <path d="M15 18l-6-6 6-6" />,

@@ -189,3 +189,37 @@ body::before {
 .video-pied { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 12px 14px; background: var(--carte); }
 .video-pied a { font-weight: 500; font-size: 14px; min-height: 44px; display: inline-flex; align-items: center; }
 .video-pied .bouton { flex: 1 1 auto; min-height: 44px; padding: 0 20px; }
+
+/* Menu ☰ (tiroir à droite) */
+.tiroir { margin: 0 0 0 auto; height: 100dvh; max-height: none; width: min(86vw, 360px); max-width: none; padding: 0; border: none; background: var(--fond); color: var(--texte); box-shadow: -8px 0 24px rgba(0,0,0,.18); }
+.tiroir[open] { animation: tiroir-entree .2s ease-out; }
+@keyframes tiroir-entree { from { transform: translateX(100%); } to { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .tiroir[open] { animation: none; } }
+.tiroir::backdrop { background: rgba(20, 16, 12, 0.5); }
+.tiroir-contenu { display: flex; flex-direction: column; gap: 20px; padding: calc(12px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom)); min-height: 100%; }
+.tiroir-haut { display: flex; align-items: center; justify-content: space-between; font-family: var(--titre); font-weight: 700; font-size: 20px; }
+.tiroir-liens { display: flex; flex-direction: column; gap: 4px; }
+.tiroir-lien { display: flex; align-items: center; gap: 14px; min-height: 52px; padding: 8px 14px; border-radius: 12px; border: none; background: none; color: var(--texte); font: 500 16px var(--corps); text-decoration: none; text-align: left; cursor: pointer; }
+.tiroir-lien:hover { background: rgba(122, 75, 31, .08); color: var(--texte); }
+.tiroir-lien:focus-visible { outline: 3px solid #C9A27A; outline-offset: 0; }
+.tiroir-lien span { display: flex; flex-direction: column; }
+.tiroir-lien small { font-size: 13px; font-weight: 400; color: var(--texte-doux); }
+.tiroir-lien.principal { background: var(--accent); color: #fff; margin-bottom: 8px; }
+.tiroir-lien.principal small { color: rgba(255,255,255,.85); }
+.tiroir-lien.principal:hover { background: var(--accent-fonce); color: #fff; }
+.tiroir-legal { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--bordure); font-size: 13px; color: var(--texte-doux); }
+.tiroir-legal h2 { font-family: var(--corps); font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--texte); margin-bottom: 6px; }
+.tiroir-legal p { margin: 0 0 2px; }
+
+/* Page Mentions légales */
+.texte-legal { max-width: 720px; padding-top: 24px; padding-bottom: 40px; display: flex; flex-direction: column; gap: 20px; }
+.texte-legal h1 { font-size: 28px; }
+.texte-legal h2 { font-family: var(--corps); font-size: 16px; font-weight: 600; letter-spacing: 0; margin-bottom: 6px; }
+.texte-legal p { margin: 0 0 8px; color: #3B332C; }
+.texte-legal .bouton { align-self: flex-start; }
+.a-completer { color: #A0301A; }
+
+/* Formulaire Mes coordonnées : sous-titres de section */
+.section-formulaire { margin-top: 12px; padding-top: 16px; border-top: 1px solid var(--bordure); }
+.section-formulaire h2 { font-size: 18px; margin-bottom: 4px; }
+.section-formulaire .aide { margin: 0; }

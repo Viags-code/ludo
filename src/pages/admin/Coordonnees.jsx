@@ -11,8 +11,14 @@ const champsSite = [
   { nom: 'telephone', label: 'Téléphone', aide: 'Fait apparaître le bouton « Appeler »', type: 'tel' },
   { nom: 'whatsapp', label: 'Numéro WhatsApp', aide: 'Laisser vide si pas de WhatsApp : le bouton proposera un SMS', type: 'tel' },
   { nom: 'facebook', label: 'Lien de la page Facebook', type: 'url' },
-  { nom: 'video', label: 'Afficher le bouton vidéo dans l’en-tête', case: true },
+  { nom: 'video', label: 'Afficher la vidéo dans le menu', case: true },
   { nom: 'presentation', label: 'Présentation courte', aide: 'Une phrase, reprise par Google et les réseaux sociaux', long: true },
+  { titre: 'Informations légales', aide: 'Affichées dans le menu et sur la page Mentions légales, obligatoire pour un site professionnel.' },
+  { nom: 'entreprise', label: 'Nom de l’entreprise', aide: 'Ex. : Ludovic Dupont, ou le nom de la société' },
+  { nom: 'statut', label: 'Forme juridique', aide: 'Ex. : Entreprise individuelle, EURL, SARL…' },
+  { nom: 'siret', label: 'Numéro SIRET', aide: '14 chiffres', type: 'text' },
+  { nom: 'adresse', label: 'Adresse de l’entreprise' },
+  { nom: 'email', label: 'E-mail de contact', type: 'email' },
 ];
 
 export default function Coordonnees() {
@@ -53,7 +59,12 @@ export default function Coordonnees() {
       </header>
       <main className="conteneur editeur page">
         <form id="coordonnees" onSubmit={enregistrer}>
-          {champsSite.map((c) => c.case ? (
+          {champsSite.map((c) => c.titre ? (
+            <div key={c.titre} className="section-formulaire">
+              <h2>{c.titre}</h2>
+              <p className="aide">{c.aide}</p>
+            </div>
+          ) : c.case ? (
             <label key={c.nom} className="case">
               <input type="checkbox" name={c.nom} checked={!!valeurs[c.nom]} onChange={changer} />
               {c.label}

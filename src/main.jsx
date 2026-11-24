@@ -8,6 +8,7 @@ import Fiche from './pages/Fiche';
 import Contact from './pages/Contact';
 import Merci from './pages/Merci';
 import Introuvable from './pages/Introuvable';
+import MentionsLegales from './pages/MentionsLegales';
 import Admin from './pages/admin/Admin';
 import EnTete from './components/EnTete';
 import './styles.css';
@@ -42,6 +43,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/articles/:id" element={<Fiche />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/merci" element={<Merci />} />
+            <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="*" element={<Introuvable />} />
           </Route>
           <Route path="/admin/*" element={<Admin />} />
