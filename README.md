@@ -59,6 +59,16 @@ Refaire `npm run build` et renvoyer le contenu de `dist/` en remplaçant les fic
 
 Ces trois éléments n'existent que sur le serveur. Les sauvegardes automatiques d'O2switch (JetBackup dans cPanel) les couvrent.
 
+## Vidéo de présentation
+
+Le bouton lecture de l'en-tête ouvre `public/video/atelier.mp4`, avec l'image d'aperçu `public/video/atelier.jpg`. Pour changer de vidéo, remplacer ces deux fichiers dans le projet (puis reconstruire et renvoyer), pas seulement sur le serveur, sinon la prochaine mise à jour remettrait l'ancienne. Une vidéo de téléphone se convertit en format léger pour le web avec :
+
+```sh
+ffmpeg -i video-du-telephone.mp4 -vf scale=720:-2 -c:v libx264 -crf 26 -preset slow -c:a aac -b:a 128k -movflags +faststart public/video/atelier.mp4
+```
+
+Ludo peut cacher ou réafficher le bouton dans « Mes coordonnées ».
+
 ## Sécurité, en bref
 
 - `/admin` est protégé par le mot de passe de `config.php`. Après 10 essais ratés, la connexion est bloquée 15 minutes.

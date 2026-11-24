@@ -1,29 +1,36 @@
 import { useEffect, useRef, useState } from 'react';
 import Icone from './Icone';
 
-// Bouton qui ouvre une vidéo Facebook (reel) dans une fenêtre au-dessus du site.
-// Le lecteur Facebook n'est chargé qu'à l'ouverture, pour garder le site rapide.
-export default function Video({ lien }) {
+// Vidéo de présentation, hébergée avec le site (public/video/atelier.mp4).
+// Pour la changer : remplacer ce fichier (MP4 en H.264, idéalement moins de 10 Mo)
+// et l'image d'aperçu atelier.jpg.
+const VIDEO = '/video/atelier.mp4';
+const APERCU = '/video/atelier.jpg';
+
+// Bouton de l'en-tête qui ouvre la vidéo dans une fenêtre au-dessus du site.
+export default function Video() {
   const [ouverte, setOuverte] = useState(false);
   const fenetre = useRef(null);
-  const fermer = useRef(null);
+  const lecteur = useRef(null);
 
   useEffect(() => {
     const el = fenetre.current;
     if (!el) return;
     if (ouverte && !el.open) {
       el.showModal();
-      // Focus sur « Fermer » plutôt que dans le lecteur Facebook, pour que la touche Échap ferme la fenêtre.
-      fermer.current?.focus();
+      lecteur.current?.play().catch(() => {
+        // Lecture automatique refusée par le navigateur : le visiteur appuie sur lecture.
+      });
     }
-    if (!ouverte && el.open) el.close();
+    if (!ouverte) {
+      lecteur.current?.pause();
+      if (el.open) el.close();
+    }
   }, [ouverte]);
-
-  const lecteur = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(lien)}&show_text=false&autoplay=true&width=360`;
 
   return (
     <>
-      <button type="button" className="bouton-rond" onClick={() => setOuverte(true)} aria-label="Voir la vidéo de l’atelier">
+      <button type="button" className="bouton-rond" onClick={() => setOuverte(true)} aria-label="Voir la vidéo de présentation">
         <Icone nom="video" />
       </button>
 
@@ -32,21 +39,17 @@ export default function Video({ lien }) {
         className="fenetre-video"
         onClose={() => setOuverte(false)}
         onClick={(e) => e.target === fenetre.current && setOuverte(false)}
-        aria-label="Vidéo de l’atelier"
+        aria-label="Vidéo de présentation"
       >
         <div className="video-cadre">
           {ouverte && (
-            <iframe
-              src={lecteur}
-              title="Vidéo de l’atelier de Ludo"
-              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-              allowFullScreen
-            />
+            <video ref={lecteur} src={VIDEO} poster={APERCU} controls playsInline preload="metadata">
+              Votre navigateur ne peut pas lire cette vidéo.
+            </video>
           )}
         </div>
         <div className="video-pied">
-          <a href={lien} target="_blank" rel="noopener">Voir sur Facebook</a>
-          <button ref={fermer} type="button" className="bouton contour" onClick={() => setOuverte(false)}>Fermer</button>
+          <button type="button" className="bouton contour" onClick={() => setOuverte(false)}>Fermer</button>
         </div>
       </dialog>
     </>

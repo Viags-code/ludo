@@ -22,7 +22,7 @@ export default function EnTete() {
           </span>
         </Link>
         <div className="bandeau-actions">
-        {site?.video && <Video lien={site.video} />}
+        {site?.video && <Video />}
         {telephone ? (
           <a className="bouton-rond plein" href={`tel:${telephone}`} aria-label="Appeler Ludo"><Icone nom="tel" /></a>
         ) : (

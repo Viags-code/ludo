@@ -11,7 +11,7 @@ const champsSite = [
   { nom: 'telephone', label: 'Téléphone', aide: 'Fait apparaître le bouton « Appeler »', type: 'tel' },
   { nom: 'whatsapp', label: 'Numéro WhatsApp', aide: 'Laisser vide si pas de WhatsApp : le bouton proposera un SMS', type: 'tel' },
   { nom: 'facebook', label: 'Lien de la page Facebook', type: 'url' },
-  { nom: 'video', label: 'Vidéo de présentation (lien Facebook)', aide: 'Lien d’un reel ou d’une vidéo Facebook publique, lancée par le bouton de l’en-tête. Laisser vide pour cacher le bouton.', type: 'url' },
+  { nom: 'video', label: 'Afficher le bouton vidéo dans l’en-tête', case: true },
   { nom: 'presentation', label: 'Présentation courte', aide: 'Une phrase, reprise par Google et les réseaux sociaux', long: true },
 ];
 
@@ -27,7 +27,10 @@ export default function Coordonnees() {
 
   if (!valeurs) return <p className="vide">Chargement…</p>;
 
-  const changer = (e) => setValeurs({ ...valeurs, [e.target.name]: e.target.value });
+  const changer = (e) => {
+    const { name, type, checked, value } = e.target;
+    setValeurs({ ...valeurs, [name]: type === 'checkbox' ? checked : value });
+  };
 
   const enregistrer = async (e) => {
     e.preventDefault();
@@ -50,7 +53,12 @@ export default function Coordonnees() {
       </header>
       <main className="conteneur editeur page">
         <form id="coordonnees" onSubmit={enregistrer}>
-          {champsSite.map((c) => (
+          {champsSite.map((c) => c.case ? (
+            <label key={c.nom} className="case">
+              <input type="checkbox" name={c.nom} checked={!!valeurs[c.nom]} onChange={changer} />
+              {c.label}
+            </label>
+          ) : (
             <label key={c.nom}>
               {c.label} {c.aide && <span className="aide">{c.aide}</span>}
               {c.long ? (
