@@ -1,7 +1,6 @@
-import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Icone from '../components/Icone';
-import Photo from '../components/Photo';
+import Carrousel from '../components/Carrousel';
 import Introuvable from './Introuvable';
 import { useDonnees } from '../donnees';
 import { formatPrix, numeroInternational, useTitre } from '../format';
@@ -9,8 +8,6 @@ import { formatPrix, numeroInternational, useTitre } from '../format';
 export default function Fiche() {
   const { id } = useParams();
   const { articles, site } = useDonnees();
-  const [photoActive, setPhotoActive] = useState(0);
-  const defile = useRef(null);
   const article = articles?.find((a) => a.id === id);
   useTitre(article?.titre, site?.nom);
 
@@ -22,35 +19,16 @@ export default function Fiche() {
   const telephone = site?.telephone ? numeroInternational(site.telephone) : '';
   const paragraphes = (description || '').split(/\n\s*\n/).filter((p) => p.trim());
 
-  const surDefilement = () => {
-    const el = defile.current;
-    if (el) setPhotoActive(Math.round(el.scrollLeft / el.clientWidth));
-  };
-
   return (
     <>
       <main className="page">
         <div className="conteneur">
           <article className="fiche">
-            <div className="galerie">
-              <div className="galerie-defile" ref={defile} onScroll={surDefilement} tabIndex={0} aria-label="Photos">
-                {photos.length === 0 ? (
-                  <div><Photo alt={titre} graine={article.id} chargement="eager" /></div>
-                ) : (
-                  photos.map((src, i) => (
-                    <div key={src}>
-                      <Photo src={src} alt={`${titre}, photo ${i + 1}`} graine={article.id} chargement={i === 0 ? 'eager' : 'lazy'} />
-                    </div>
-                  ))
-                )}
-              </div>
+            <Carrousel key={article.id} photos={photos} titre={titre} graine={article.id}>
               <Link className="bouton-rond retour" to="/" aria-label="Retour aux réalisations">
                 <Icone nom="retour" />
               </Link>
-              {photos.length > 1 && (
-                <span className="compteur" aria-live="polite">{photoActive + 1} / {photos.length}</span>
-              )}
-            </div>
+            </Carrousel>
 
             <div className="infos">
               <div className="entete-fiche">

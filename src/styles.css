@@ -66,13 +66,14 @@ h1, h2 { font-family: var(--titre); letter-spacing: -0.3px; margin: 0; }
 /* Fiche article */
 .fiche { display: grid; gap: 20px; }
 @media (min-width: 800px) { .fiche { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 40px; padding-top: 24px; } }
-.galerie { position: relative; margin: 0 -20px; }
-@media (min-width: 800px) { .galerie { margin: 0; border-radius: var(--rayon); overflow: hidden; } }
+.carrousel { margin: 0 -20px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.carrousel-cadre { position: relative; }
+@media (min-width: 800px) { .carrousel { margin: 0; } .carrousel-cadre { border-radius: var(--rayon); overflow: hidden; } }
 .galerie-defile { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .galerie-defile::-webkit-scrollbar { display: none; }
 .galerie-defile > * { flex: 0 0 100%; scroll-snap-align: start; aspect-ratio: 1 / 1; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.85); }
 .galerie-defile img { width: 100%; height: 100%; object-fit: cover; }
-.galerie .retour { position: absolute; top: 16px; left: 16px; }
+.carrousel .retour { position: absolute; top: 16px; left: 16px; }
 .compteur { position: absolute; bottom: 16px; right: 16px; background: rgba(31,26,22,.75); color: #fff; font-size: 13px; font-weight: 500; padding: 4px 10px; border-radius: 12px; }
 .infos { display: flex; flex-direction: column; gap: 16px; }
 .statut { align-self: flex-start; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 6px; background: var(--vert-fond); color: var(--vert-texte); }
@@ -136,3 +137,21 @@ legend { font-size: 14px; font-weight: 500; padding: 0; margin-bottom: 8px; }
 .ajout-photo { aspect-ratio: 1 / 1; border-radius: var(--rayon); border: 2px dashed #B9AE9F; background: var(--fond); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: #3B332C; font: 500 13px var(--corps); cursor: pointer; }
 label.case { flex-direction: row; align-items: center; gap: 12px; font-size: 15px; min-height: 44px; }
 label.case input { width: 22px; height: 22px; min-height: 0; accent-color: var(--accent); }
+
+/* Carrousel de la fiche */
+.galerie-defile { scroll-behavior: smooth; }
+.galerie-defile:focus-visible { outline: 3px solid #C9A27A; outline-offset: -3px; }
+.fleche { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: 22px; border: none; background: rgba(255,255,255,.92); color: var(--texte); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+.fleche.gauche { left: 12px; }
+.fleche.droite { right: 12px; }
+.fleche:disabled { opacity: 0; pointer-events: none; }
+.fleche:focus-visible { outline: 3px solid #C9A27A; outline-offset: 2px; }
+.points { position: absolute; bottom: 20px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; pointer-events: none; }
+.points span { width: 8px; height: 8px; border-radius: 4px; background: rgba(255,255,255,.55); transition: width .2s, background .2s; }
+.points span.actif { width: 20px; background: #fff; }
+.miniatures { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 4px; scrollbar-width: none; }
+.miniatures::-webkit-scrollbar { display: none; }
+@media (min-width: 800px) { .miniatures { padding: 0 0 4px; } }
+.miniatures button { flex: 0 0 64px; height: 64px; padding: 0; border: 2px solid transparent; border-radius: 10px; overflow: hidden; background: #E9E3DA; cursor: pointer; opacity: .7; }
+.miniatures button.actif { border-color: var(--accent); opacity: 1; }
+.miniatures img { width: 100%; height: 100%; object-fit: cover; }
