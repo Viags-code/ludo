@@ -76,6 +76,7 @@ function siteParDefaut(): array
         'telephone' => '',
         'whatsapp' => '',
         'facebook' => 'https://www.facebook.com/LUDOBOISPLANCHE/',
+        'video' => 'https://www.facebook.com/reel/2257568401772619',
         'presentation' => 'Meubles et créations en bois, pièces uniques et sur mesure.',
     ];
 }
@@ -282,6 +283,7 @@ switch ($action) {
             $site[$cle] = texte($d[$cle] ?? $defaut, $cle === 'presentation' ? 300 : 120);
         }
         if ($site['facebook'] !== '' && !preg_match('#^https://#', $site['facebook'])) erreur('Le lien Facebook doit commencer par https://');
+        if ($site['video'] !== '' && !preg_match('#^https://(www\.|m\.)?(facebook\.com|fb\.watch)/#', $site['video'])) erreur('Le lien de la vidéo doit être une adresse Facebook (https://www.facebook.com/...).');
         ecrireJson('site', $site);
         repondre(['site' => $site]);
     }

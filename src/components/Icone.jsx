@@ -15,6 +15,7 @@ const chemins = {
       <circle cx="12" cy="13" r="4" />
     </>
   ),
+  video: <path d="M8 5.5v13l11-6.5z" />,
   plus: <path d="M12 5v14M5 12h14" />,
   fermer: <path d="M18 6L6 18M6 6l12 12" />,
   gauche: <path d="M15 18l-6-6 6-6" />,

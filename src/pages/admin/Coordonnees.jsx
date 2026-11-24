@@ -11,6 +11,7 @@ const champsSite = [
   { nom: 'telephone', label: 'Téléphone', aide: 'Fait apparaître le bouton « Appeler »', type: 'tel' },
   { nom: 'whatsapp', label: 'Numéro WhatsApp', aide: 'Laisser vide si pas de WhatsApp : le bouton proposera un SMS', type: 'tel' },
   { nom: 'facebook', label: 'Lien de la page Facebook', type: 'url' },
+  { nom: 'video', label: 'Vidéo de présentation (lien Facebook)', aide: 'Lien d’un reel ou d’une vidéo Facebook publique, lancée par le bouton de l’en-tête. Laisser vide pour cacher le bouton.', type: 'url' },
   { nom: 'presentation', label: 'Présentation courte', aide: 'Une phrase, reprise par Google et les réseaux sociaux', long: true },
 ];
 

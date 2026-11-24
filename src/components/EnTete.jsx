@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import Icone from './Icone';
+import Video from './Video';
 import { useDonnees } from '../donnees';
 import { numeroInternational } from '../format';
 
@@ -20,11 +21,14 @@ export default function EnTete() {
             {sousTitre && <span className="sous-titre">{sousTitre}</span>}
           </span>
         </Link>
+        <div className="bandeau-actions">
+        {site?.video && <Video lien={site.video} />}
         {telephone ? (
           <a className="bouton-rond plein" href={`tel:${telephone}`} aria-label="Appeler Ludo"><Icone nom="tel" /></a>
         ) : (
           <Link className="bouton-rond plein" to="/contact" aria-label="Contacter Ludo"><Icone nom="tel" /></Link>
         )}
+        </div>
       </div>
     </header>
   );

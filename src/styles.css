@@ -179,3 +179,13 @@ body::before {
 .marque:focus-visible { outline: 3px solid #C9A27A; outline-offset: 4px; border-radius: 8px; }
 .filtres { padding-top: 16px; }
 @media (min-width: 800px) { .fiche { padding-top: 24px; } }
+
+/* Bouton et fenêtre vidéo */
+.bandeau-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+.fenetre-video { width: min(92vw, 380px); padding: 0; border: none; border-radius: 16px; background: #000; color: #fff; overflow: hidden; }
+.fenetre-video::backdrop { background: rgba(20, 16, 12, 0.75); }
+.video-cadre { aspect-ratio: 9 / 16; max-height: calc(100dvh - 140px); width: 100%; background: #111; }
+.video-cadre iframe { width: 100%; height: 100%; border: 0; display: block; }
+.video-pied { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: var(--carte); }
+.video-pied a { font-weight: 500; font-size: 14px; min-height: 44px; display: inline-flex; align-items: center; }
+.video-pied .bouton { flex: 0 0 auto; min-height: 44px; padding: 0 20px; }
