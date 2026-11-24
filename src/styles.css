@@ -155,3 +155,14 @@ label.case input { width: 22px; height: 22px; min-height: 0; accent-color: var(-
 .miniatures button { flex: 0 0 64px; height: 64px; padding: 0; border: 2px solid transparent; border-radius: 10px; overflow: hidden; background: #E9E3DA; cursor: pointer; opacity: .7; }
 .miniatures button.actif { border-color: var(--accent); opacity: 1; }
 .miniatures img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Image de fond (bois et forêt), très atténuée pour garder le texte lisible */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: url('/fond.jpg') center / cover no-repeat;
+  opacity: var(--opacite-fond, 0.14);
+  pointer-events: none;
+}
