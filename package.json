@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "api": "php -S localhost:8000 -t public",
+    "api": "php -d upload_max_filesize=256M -d post_max_size=256M -S localhost:8000 -t public",
     "build": "vite build",
     "preview": "vite preview"
   },

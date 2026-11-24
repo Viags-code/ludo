@@ -3,7 +3,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../api';
 import { useDonnees } from '../../donnees';
 import Icone from '../../components/Icone';
-import { reduirePhoto } from './reduirePhoto';
+import { apercuDeVideo, reduirePhoto } from './reduirePhoto';
+import { apercuVideo, estVideo } from '../../media';
+
+const TAILLE_MAX_VIDEO = 200 * 1024 * 1024;
 
 const vide = { titre: '', prix: '', vendu: false, bois: '', dimensions: '', description: '' };
 let compteur = 0;
@@ -19,6 +22,7 @@ export default function EditeurArticle() {
   // Chaque photo : { cle, url } pour une photo déjà en ligne, { cle, fichier, apercu } pour une nouvelle.
   const [photos, setPhotos] = useState([]);
   const [etat, setEtat] = useState({ enCours: false, erreur: '' });
+  const [progression, setProgression] = useState(null);
   const [pret, setPret] = useState(!id);
   const choixPhotos = useRef(null);
 
@@ -32,7 +36,7 @@ export default function EditeurArticle() {
         dimensions: existant.dimensions || '',
         description: existant.description || '',
       });
-      setPhotos(existant.photos.map((url) => ({ cle: url, url })));
+      setPhotos(existant.photos.map((url) => ({ cle: url, url, video: estVideo(url) })));
       setPret(true);
     }
   }, [existant, pret]);
@@ -41,7 +45,10 @@ export default function EditeurArticle() {
   const photosRef = useRef(photos);
   photosRef.current = photos;
   useEffect(() => () => {
-    photosRef.current.forEach((p) => p.apercu && URL.revokeObjectURL(p.apercu));
+    photosRef.current.forEach((p) => {
+      if (p.apercu) URL.revokeObjectURL(p.apercu);
+      if (p.imageApercu) URL.revokeObjectURL(p.imageApercu);
+    });
   }, []);
 
   if (id && articles === null) return <p className="vide">Chargement…</p>;
@@ -53,9 +60,27 @@ export default function EditeurArticle() {
   };
 
   const ajouterPhotos = (e) => {
-    const nouvelles = [...e.target.files].map((fichier) => ({ cle: `n${compteur++}`, fichier, apercu: URL.createObjectURL(fichier) }));
-    setPhotos((p) => [...p, ...nouvelles].slice(0, 12));
+    const fichiers = [...e.target.files];
     e.target.value = '';
+    const tropLourdes = fichiers.filter((f) => f.type.startsWith('video/') && f.size > TAILLE_MAX_VIDEO);
+    setEtat((et) => ({ ...et, erreur: tropLourdes.length ? 'Une vidéo dépasse 200 Mo : raccourcissez-la ou filmez en qualité 1080p.' : '' }));
+
+    const nouvelles = fichiers
+      .filter((f) => !tropLourdes.includes(f))
+      .map((fichier) => {
+        const element = { cle: `n${compteur++}`, fichier, apercu: URL.createObjectURL(fichier), video: fichier.type.startsWith('video/') };
+        if (element.video) {
+          // L'aperçu se fabrique en arrière-plan ; on l'attend au moment de publier.
+          element.apercuPret = apercuDeVideo(fichier).then((image) => {
+            setPhotos((liste) => liste.map((p) => (p.cle === element.cle
+              ? { ...p, imageApercu: image ? URL.createObjectURL(image) : null, illisible: !image }
+              : p)));
+            return image;
+          });
+        }
+        return element;
+      });
+    setPhotos((p) => [...p, ...nouvelles].slice(0, 12));
   };
 
   const deplacer = (index, sens) => {
@@ -69,6 +94,7 @@ export default function EditeurArticle() {
   const retirer = (index) => {
     const p = photos[index];
     if (p.apercu) URL.revokeObjectURL(p.apercu);
+    if (p.imageApercu) URL.revokeObjectURL(p.imageApercu);
     setPhotos(photos.filter((_, i) => i !== index));
   };
 
@@ -89,16 +115,23 @@ export default function EditeurArticle() {
       const ordre = [];
       for (const p of photos) {
         if (p.url) ordre.push(p.url);
-        else {
+        else if (p.video) {
+          formulaire.append('nouvelles[]', p.fichier);
+          const image = await p.apercuPret;
+          if (image) formulaire.append(`apercu_${n}`, image);
+          ordre.push(`nouvelle:${n++}`);
+        } else {
           formulaire.append('nouvelles[]', await reduirePhoto(p.fichier));
           ordre.push(`nouvelle:${n++}`);
         }
       }
       formulaire.append('ordre', JSON.stringify(ordre));
-      await api.enregistrerArticle(formulaire);
+      setProgression(0);
+      await api.enregistrerArticle(formulaire, setProgression);
       await recharger();
       navigate('/admin');
     } catch (err) {
+      setProgression(null);
       setEtat({ enCours: false, erreur: err.message });
     }
   };
@@ -126,16 +159,22 @@ export default function EditeurArticle() {
       <main className="conteneur editeur page">
         <form id="editeur" onSubmit={publier}>
           <fieldset className="champ-photos">
-            <legend>Photos</legend>
+            <legend>Photos et vidéos</legend>
             <div className="grille-photos">
               {photos.map((p, i) => (
                 <div className="photo-editee" key={p.cle}>
-                  <img src={p.url || p.apercu} alt={`Photo ${i + 1}`} />
+                  {!p.video && <img src={p.url || p.apercu} alt={`Photo ${i + 1}`} />}
+                  {p.video && p.url && <img src={apercuVideo(p.url)} alt={`Vidéo ${i + 1}`} />}
+                  {p.video && !p.url && (p.imageApercu
+                    ? <img src={p.imageApercu} alt={`Vidéo ${i + 1}`} />
+                    : <video src={p.apercu} muted playsInline preload="metadata" aria-label={`Vidéo ${i + 1}`} />)}
                   {i === 0 && <span className="etiquette">Vignette</span>}
+                  {p.video && <span className="etiquette video">Vidéo</span>}
+                  {p.illisible && <span className="avertissement-video">Format peu compatible</span>}
                   <div className="outils-photo">
-                    <button type="button" onClick={() => deplacer(i, -1)} disabled={i === 0} aria-label={`Avancer la photo ${i + 1}`}><Icone nom="gauche" taille={16} /></button>
-                    <button type="button" onClick={() => retirer(i)} aria-label={`Retirer la photo ${i + 1}`}><Icone nom="fermer" taille={16} /></button>
-                    <button type="button" onClick={() => deplacer(i, 1)} disabled={i === photos.length - 1} aria-label={`Reculer la photo ${i + 1}`}><Icone nom="droite" taille={16} /></button>
+                    <button type="button" onClick={() => deplacer(i, -1)} disabled={i === 0} aria-label={`Avancer l’élément ${i + 1}`}><Icone nom="gauche" taille={16} /></button>
+                    <button type="button" onClick={() => retirer(i)} aria-label={`Retirer l’élément ${i + 1}`}><Icone nom="fermer" taille={16} /></button>
+                    <button type="button" onClick={() => deplacer(i, 1)} disabled={i === photos.length - 1} aria-label={`Reculer l’élément ${i + 1}`}><Icone nom="droite" taille={16} /></button>
                   </div>
                 </div>
               ))}
@@ -145,8 +184,11 @@ export default function EditeurArticle() {
                 </button>
               )}
             </div>
-            <input ref={choixPhotos} type="file" accept="image/*" multiple hidden onChange={ajouterPhotos} />
-            <span className="aide">Prendre une photo ou choisir dans la galerie. La première sert de vignette.</span>
+            <input ref={choixPhotos} type="file" accept="image/*,video/*" multiple hidden onChange={ajouterPhotos} />
+            <span className="aide">Prendre une photo ou une vidéo, ou choisir dans la galerie. La première sert de vignette (mettez plutôt une photo en premier). Vidéos : 200 Mo maximum, de préférence courtes.</span>
+            {photos.some((p) => p.illisible) && (
+              <p className="alerte">Une vidéo n'a pas pu être lue par ce navigateur : elle risque de ne pas s'afficher chez tous les visiteurs. Sur le téléphone, désactivez « Vidéos haute efficacité (HEVC) » dans les réglages de l'appareil photo, puis refilmez.</p>
+            )}
           </fieldset>
 
           <label>Titre
@@ -179,7 +221,7 @@ export default function EditeurArticle() {
       <div className="barre-bas">
         <div className="conteneur">
           <button className="bouton plein" type="submit" form="editeur" disabled={etat.enCours}>
-            {etat.enCours ? 'Publication…' : id ? 'Enregistrer' : 'Publier'}
+            {etat.enCours ? (progression !== null && progression < 100 ? `Envoi… ${progression} %` : 'Publication…') : id ? 'Enregistrer' : 'Publier'}
           </button>
         </div>
       </div>

@@ -42,12 +42,13 @@ Les réalisations ajoutées en local vont dans `public/api/donnees/` et `public/
 2. **HTTPS** : dans cPanel, « Lets Encrypt™ SSL » (ou AutoSSL), activer le certificat pour le domaine.
 3. **Adresse d'envoi** : dans cPanel, « Comptes de messagerie », créer par exemple `site@votre-domaine.fr`. Le formulaire de contact enverra les messages depuis cette adresse.
 4. **Construire le site** sur l'ordinateur : `npm install` puis `npm run build`. Le résultat est le dossier `dist/`.
-5. **Envoyer** tout le *contenu* de `dist/` dans `public_html/` (ou le dossier du domaine), avec le Gestionnaire de fichiers de cPanel ou en FTP (FileZilla). Les fichiers `.htaccess` sont cachés par défaut : penser à afficher les fichiers cachés pour vérifier qu'ils sont bien partis.
-6. **Réglages** : dans `public_html/api/`, copier `config.exemple.php` sous le nom `config.php`, puis l'ouvrir et remplir :
+5. **Vidéos** : pour que Ludo puisse ajouter des vidéos à ses réalisations, dans cPanel › « Sélecteur de version PHP » › Options, mettre `upload_max_filesize` à `256M`, `post_max_size` à `256M` et `max_execution_time` à `300`.
+6. **Envoyer** tout le *contenu* de `dist/` dans `public_html/` (ou le dossier du domaine), avec le Gestionnaire de fichiers de cPanel ou en FTP (FileZilla). Les fichiers `.htaccess` sont cachés par défaut : penser à afficher les fichiers cachés pour vérifier qu'ils sont bien partis.
+7. **Réglages** : dans `public_html/api/`, copier `config.exemple.php` sous le nom `config.php`, puis l'ouvrir et remplir :
    - `mot_de_passe` : le mot de passe de Ludo pour `/admin` ;
    - `email_contact` : l'adresse où Ludo reçoit les messages ;
    - `email_expediteur` : l'adresse créée à l'étape 3.
-7. Aller sur `https://votre-domaine.fr/admin`, se connecter, puis remplir « Mes coordonnées » et ajouter les premières réalisations.
+8. Aller sur `https://votre-domaine.fr/admin`, se connecter, puis remplir « Mes coordonnées » et ajouter les premières réalisations.
 
 ### Pour une mise à jour du code
 
@@ -73,5 +74,6 @@ Ludo peut cacher ou réafficher le bouton dans « Mes coordonnées ».
 
 - `/admin` est protégé par le mot de passe de `config.php`. Après 10 essais ratés, la connexion est bloquée 15 minutes.
 - Les fichiers de `api/donnees/` et `config.php` ne sont jamais lisibles depuis le navigateur.
+- Les vidéos des réalisations sont gardées telles quelles (200 Mo maximum, MP4, MOV ou WebM), avec une image d'aperçu fabriquée par le navigateur de Ludo. Si ce navigateur n'arrive pas à lire une vidéo (format HEVC), l'espace Ludo l'avertit qu'elle risque de ne pas s'afficher partout.
 - Les photos envoyées sont vérifiées, réduites à 1600 px et réenregistrées en JPEG, ce qui retire aussi les données GPS du téléphone.
 - Le formulaire de contact accepte 5 messages par heure et par visiteur, et ignore les robots qui remplissent le champ caché.

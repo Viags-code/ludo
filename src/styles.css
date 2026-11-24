@@ -223,3 +223,16 @@ body::before {
 .section-formulaire { margin-top: 12px; padding-top: 16px; border-top: 1px solid var(--bordure); }
 .section-formulaire h2 { font-size: 18px; margin-bottom: 4px; }
 .section-formulaire .aide { margin: 0; }
+
+/* Vidéos dans les réalisations */
+.galerie-defile video { width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+.vignette .badge-lecture, .miniatures .badge-lecture { position: absolute; right: 8px; bottom: 8px; width: 30px; height: 30px; border-radius: 15px; background: rgba(31,26,22,.75); color: #fff; display: flex; align-items: center; justify-content: center; }
+.miniatures button { position: relative; }
+.miniatures .badge-lecture { right: 4px; bottom: 4px; width: 22px; height: 22px; }
+.miniatures .sans-photo svg { width: 20px; height: 20px; }
+.mini { position: relative; }
+.mini .badge-lecture { position: absolute; right: 4px; bottom: 4px; width: 22px; height: 22px; border-radius: 11px; background: rgba(31,26,22,.75); color: #fff; display: flex; align-items: center; justify-content: center; }
+.photo-editee video { width: 100%; height: 100%; object-fit: cover; }
+.etiquette.video { left: auto; right: 8px; background: #2F5D50; }
+.avertissement-video { position: absolute; left: 4px; right: 4px; top: 34px; background: #FBEAE5; color: #8A2A12; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 6px; text-align: center; }
+.sur-video .points, .sur-video .compteur { display: none; } /* laisse la place aux commandes de la vidéo */

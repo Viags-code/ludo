@@ -16,6 +16,28 @@ async function appel(action, options = {}) {
   return donnees;
 }
 
+// Envoi de fichiers avec suivi de la progression (utile pour les vidéos en 4G).
+function envoyerAvecProgression(action, formulaire, surProgression) {
+  return new Promise((resoudre, rejeter) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', `/api/index.php?action=${action}`);
+    xhr.setRequestHeader('X-Requested-With', 'ludo');
+    xhr.upload.onprogress = (e) => e.lengthComputable && surProgression?.(Math.round((e.loaded / e.total) * 100));
+    xhr.onerror = () => rejeter(new Error('Connexion perdue pendant l’envoi. Réessayez.'));
+    xhr.onload = () => {
+      let donnees = {};
+      try {
+        donnees = JSON.parse(xhr.responseText);
+      } catch {
+        // réponse vide ou non JSON
+      }
+      if (xhr.status >= 200 && xhr.status < 300) resoudre(donnees);
+      else rejeter(new Error(donnees.erreur || (xhr.status === 413 ? 'Envoi trop lourd pour le serveur.' : 'Le serveur ne répond pas. Réessayez.')));
+    };
+    xhr.send(formulaire);
+  });
+}
+
 const json = (action, corps) =>
   appel(action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corps ?? {}) });
 
@@ -25,7 +47,7 @@ export const api = {
   session: () => appel('session'),
   connexion: (motDePasse) => json('connexion', { mot_de_passe: motDePasse }),
   deconnexion: () => json('deconnexion'),
-  enregistrerArticle: (formulaire) => appel('article', { method: 'POST', body: formulaire }).then((d) => d.article),
+  enregistrerArticle: (formulaire, surProgression) => envoyerAvecProgression('article', formulaire, surProgression).then((d) => d.article),
   supprimerArticle: (id) => json('supprimer', { id }),
   enregistrerSite: (site) => json('site', site).then((d) => d.site),
   contact: (message) => json('contact', message),

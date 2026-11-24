@@ -9,6 +9,8 @@ const DOSSIER_DONNEES = __DIR__ . '/donnees';
 const DOSSIER_PHOTOS = __DIR__ . '/../uploads';
 const URL_PHOTOS = '/uploads';
 const TAILLE_MAX_PHOTO = 15 * 1024 * 1024;
+const TAILLE_MAX_VIDEO = 200 * 1024 * 1024;
+const FORMATS_VIDEO = ['video/mp4' => 'mp4', 'video/quicktime' => 'mov', 'video/webm' => 'webm'];
 const COTE_MAX_PHOTO = 1600;
 const MAX_PHOTOS = 12;
 
@@ -119,9 +121,27 @@ function slug(string $texte): string
 }
 
 // Vérifie, redimensionne et réenregistre une photo envoyée (retire aussi les données GPS).
-function enregistrerPhoto(array $fichier, string $prefixe): string
+function preparerDossierPhotos(): void
 {
-    if ($fichier['error'] !== UPLOAD_ERR_OK) erreur("Une photo n'a pas pu être envoyée.");
+    if (!is_dir(DOSSIER_PHOTOS)) {
+        mkdir(DOSSIER_PHOTOS, 0755, true);
+        // Aucun script ne doit pouvoir s'exécuter depuis le dossier des photos.
+        file_put_contents(DOSSIER_PHOTOS . '/.htaccess', "<FilesMatch \"\\.(php|phtml|phar|pl|py|cgi)$\">\n  Require all denied\n</FilesMatch>\nOptions -Indexes\n");
+    }
+}
+
+function verifierEnvoi(array $fichier, string $quoi): void
+{
+    if (in_array($fichier['error'], [UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_FORM_SIZE], true)) {
+        erreur("$quoi est trop lourde pour le serveur. Augmenter « upload_max_filesize » dans cPanel (voir README).");
+    }
+    if ($fichier['error'] !== UPLOAD_ERR_OK) erreur("$quoi n'a pas pu être envoyée. Réessayez.");
+}
+
+// $nom : nom de fichier imposé (sans extension), sinon généré à partir de $prefixe.
+function enregistrerPhoto(array $fichier, string $prefixe, ?string $nom = null): string
+{
+    verifierEnvoi($fichier, 'Une photo');
     if ($fichier['size'] > TAILLE_MAX_PHOTO) erreur('Une photo est trop lourde (15 Mo maximum).');
     $infos = @getimagesize($fichier['tmp_name']);
     if (!$infos || !in_array($infos[2], [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_WEBP], true)) {
@@ -137,22 +157,41 @@ function enregistrerPhoto(array $fichier, string $prefixe): string
         $image = imagescale($image, (int) round($largeur * $ratio), (int) round($hauteur * $ratio));
     }
 
-    if (!is_dir(DOSSIER_PHOTOS)) {
-        mkdir(DOSSIER_PHOTOS, 0755, true);
-        // Aucun script ne doit pouvoir s'exécuter depuis le dossier des photos.
-        file_put_contents(DOSSIER_PHOTOS . '/.htaccess', "<FilesMatch \"\\.(php|phtml|phar|pl|py|cgi)$\">\n  Require all denied\n</FilesMatch>\nOptions -Indexes\n");
-    }
-    $nom = $prefixe . '-' . bin2hex(random_bytes(4)) . '.jpg';
+    preparerDossierPhotos();
+    $nom = ($nom ?? $prefixe . '-' . bin2hex(random_bytes(4))) . '.jpg';
     imageinterlace($image, true);
     imagejpeg($image, DOSSIER_PHOTOS . '/' . $nom, 82);
     return URL_PHOTOS . '/' . $nom;
 }
 
+// Une vidéo est gardée telle quelle (pas de conversion possible sur l'hébergement).
+// Son image d'aperçu, fabriquée par le navigateur de Ludo, porte le même nom en .jpg.
+function enregistrerVideo(array $fichier, string $prefixe, ?array $apercu): string
+{
+    verifierEnvoi($fichier, 'Une vidéo');
+    if ($fichier['size'] > TAILLE_MAX_VIDEO) erreur('Une vidéo est trop lourde (200 Mo maximum).');
+    $type = (new finfo(FILEINFO_MIME_TYPE))->file($fichier['tmp_name']);
+    $extension = FORMATS_VIDEO[$type] ?? null;
+    if (!$extension) erreur('Format de vidéo non reconnu (MP4, MOV ou WebM).');
+
+    preparerDossierPhotos();
+    $base = $prefixe . '-' . bin2hex(random_bytes(4));
+    if (!move_uploaded_file($fichier['tmp_name'], DOSSIER_PHOTOS . "/$base.$extension")) erreur("La vidéo n'a pas pu être enregistrée.");
+    if ($apercu && $apercu['error'] === UPLOAD_ERR_OK) enregistrerPhoto($apercu, $prefixe, $base);
+    return URL_PHOTOS . "/$base.$extension";
+}
+
+function estVideo(string $nomOuType): bool
+{
+    return (bool) preg_match('/(\.(mp4|mov|webm)$|^video\/)/', $nomOuType);
+}
+
 function supprimerPhoto(string $url): void
 {
     $nom = basename($url);
-    if (str_starts_with($url, URL_PHOTOS . '/') && preg_match('/^[a-z0-9-]+\.jpg$/', $nom)) {
+    if (str_starts_with($url, URL_PHOTOS . '/') && preg_match('/^([a-z0-9-]+)\.(jpg|mp4|mov|webm)$/', $nom, $m)) {
         @unlink(DOSSIER_PHOTOS . '/' . $nom);
+        if ($m[2] !== 'jpg') @unlink(DOSSIER_PHOTOS . '/' . $m[1] . '.jpg'); // aperçu de la vidéo
     }
 }
 
@@ -208,6 +247,10 @@ switch ($action) {
 
     case 'article': {
         exigerAdmin();
+        // Envoi plus gros que « post_max_size » : PHP jette tout, on l'explique clairement.
+        if (empty($_POST) && (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+            erreur("L'envoi est trop lourd pour le serveur (vidéo trop longue ?). Augmenter « post_max_size » dans cPanel (voir README).", 413);
+        }
         $verrou = verrouiller();
         $articles = lireJson('articles', []);
         $id = texte($_POST['id'] ?? '', 80);
@@ -229,11 +272,12 @@ switch ($action) {
         if (!empty($_FILES['nouvelles']['name'])) {
             $f = $_FILES['nouvelles'];
             $nombre = is_array($f['name']) ? count($f['name']) : 0;
-            if (count($gardees) + $nombre > MAX_PHOTOS) erreur('12 photos maximum par article.');
+            if (count($gardees) + $nombre > MAX_PHOTOS) erreur('12 photos ou vidéos maximum par article.');
             for ($i = 0; $i < $nombre; $i++) {
-                $envoyees[$i] = enregistrerPhoto([
-                    'error' => $f['error'][$i], 'size' => $f['size'][$i], 'tmp_name' => $f['tmp_name'][$i],
-                ], $nouveauId);
+                $fichier = ['error' => $f['error'][$i], 'size' => $f['size'][$i], 'tmp_name' => $f['tmp_name'][$i]];
+                $envoyees[$i] = estVideo((string) $f['type'][$i]) || estVideo(strtolower((string) $f['name'][$i]))
+                    ? enregistrerVideo($fichier, $nouveauId, $_FILES["apercu_$i"] ?? null)
+                    : enregistrerPhoto($fichier, $nouveauId);
             }
         }
         // « ordre » mélange anciennes photos (url) et nouvelles (« nouvelle:N »).
