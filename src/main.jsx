@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { FournisseurDonnees } from './donnees';
 import Accueil from './pages/Accueil';
@@ -9,6 +9,7 @@ import Contact from './pages/Contact';
 import Merci from './pages/Merci';
 import Introuvable from './pages/Introuvable';
 import Admin from './pages/admin/Admin';
+import EnTete from './components/EnTete';
 import './styles.css';
 
 // Revient en haut de la page à chaque changement d'adresse.
@@ -20,18 +21,30 @@ function HautDePage() {
   return null;
 }
 
+// Pages publiques : toutes ont l'en-tête fixe.
+function PagesPubliques() {
+  return (
+    <>
+      <EnTete />
+      <Outlet />
+    </>
+  );
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <FournisseurDonnees>
         <HautDePage />
         <Routes>
-          <Route path="/" element={<Accueil />} />
-          <Route path="/articles/:id" element={<Fiche />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/merci" element={<Merci />} />
+          <Route element={<PagesPubliques />}>
+            <Route path="/" element={<Accueil />} />
+            <Route path="/articles/:id" element={<Fiche />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/merci" element={<Merci />} />
+            <Route path="*" element={<Introuvable />} />
+          </Route>
           <Route path="/admin/*" element={<Admin />} />
-          <Route path="*" element={<Introuvable />} />
         </Routes>
       </FournisseurDonnees>
     </BrowserRouter>

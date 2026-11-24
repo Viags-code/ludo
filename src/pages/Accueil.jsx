@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Icone from '../components/Icone';
 import Photo from '../components/Photo';
 import { useDonnees } from '../donnees';
 import { formatPrix, useTitre } from '../format';
@@ -24,18 +23,6 @@ export default function Accueil() {
     <>
       <main className="page">
         <div className="conteneur">
-          <header className="entete">
-            <div>
-              <Link className="nom" to="/">{site?.nom ?? 'Ludo Bois Planche'}</Link>
-              <span className="sous-titre">
-                {[site?.metier, site?.ville].filter(Boolean).join(', ')}
-              </span>
-            </div>
-            <Link className="bouton-rond plein" to="/contact" aria-label="Contacter Ludo">
-              <Icone nom="tel" />
-            </Link>
-          </header>
-
           <div className="filtres" role="group" aria-label="Filtrer les réalisations">
             {filtres.map((f) => (
               <button key={f.id} className="filtre" type="button" aria-pressed={filtre === f.id} onClick={() => setFiltre(f.id)}>
