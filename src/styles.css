@@ -102,3 +102,37 @@ input:focus, textarea:focus, .filtre:focus-visible, .bouton:focus-visible, .bout
 .cache { position: absolute; left: -9999px; }
 .pied { font-size: 13px; color: var(--texte-doux); text-align: center; }
 .carte[hidden] { display: none; }
+
+/* Ajouts pour la version React */
+#root { min-height: 100vh; }
+.sans-photo { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.85); }
+.entete-fiche { display: flex; flex-direction: column; gap: 6px; }
+.alerte { background: #FBEAE5; color: #8A2A12; border-radius: 10px; padding: 10px 14px; margin: 0 0 12px; font-size: 14px; }
+.bouton:disabled { opacity: .6; cursor: wait; }
+.bouton.danger { background: transparent; color: #A0301A; border-color: #E2B4A8; margin-top: 8px; }
+
+/* Espace Ludo */
+.lien-discret { background: none; border: none; color: var(--texte-doux); font: 500 14px var(--corps); text-decoration: underline; min-height: 44px; cursor: pointer; }
+.liens-admin { display: flex; gap: 20px; padding-bottom: 16px; font-weight: 500; flex-wrap: wrap; }
+.liens-admin a { min-height: 44px; display: inline-flex; align-items: center; }
+.liste-admin { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.liste-admin a { display: flex; align-items: center; gap: 12px; padding: 10px; background: var(--carte); border: 1px solid var(--bordure); border-radius: var(--rayon); color: var(--texte); text-decoration: none; }
+.mini { width: 64px; height: 64px; border-radius: 10px; overflow: hidden; flex: none; }
+.mini img { width: 100%; height: 100%; object-fit: cover; }
+.liste-texte { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 14px; color: var(--texte-doux); }
+.liste-texte strong { color: var(--texte); font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barre-admin { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: var(--carte); border-bottom: 1px solid var(--bordure); font-family: var(--titre); font-weight: 700; font-size: 18px; }
+.espace-44 { width: 44px; }
+.editeur { max-width: 640px; padding-top: 20px; }
+.aide { font-size: 12px; font-weight: 400; color: var(--texte-doux); }
+fieldset { border: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+legend { font-size: 14px; font-weight: 500; padding: 0; margin-bottom: 8px; }
+.grille-photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.photo-editee { position: relative; aspect-ratio: 1 / 1; border-radius: var(--rayon); overflow: hidden; background: #E9E3DA; }
+.photo-editee img { width: 100%; height: 100%; object-fit: cover; }
+.outils-photo { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; padding: 4px; background: linear-gradient(transparent, rgba(0,0,0,.45)); }
+.outils-photo button { width: 32px; height: 32px; border-radius: 16px; border: none; background: rgba(255,255,255,.92); color: var(--texte); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.outils-photo button:disabled { opacity: .35; }
+.ajout-photo { aspect-ratio: 1 / 1; border-radius: var(--rayon); border: 2px dashed #B9AE9F; background: var(--fond); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: #3B332C; font: 500 13px var(--corps); cursor: pointer; }
+label.case { flex-direction: row; align-items: center; gap: 12px; font-size: 15px; min-height: 44px; }
+label.case input { width: 22px; height: 22px; min-height: 0; accent-color: var(--accent); }

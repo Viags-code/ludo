@@ -1,0 +1,7 @@
+# Seul index.php répond ; config.exemple.php et les autres fichiers restent inaccessibles.
+<FilesMatch "\.php$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^index\.php$">
+  Require all granted
+</FilesMatch>

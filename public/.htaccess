@@ -1,0 +1,16 @@
+# O2switch (Apache) : toutes les adresses du site (/articles/..., /contact, /admin)
+# renvoient vers index.html, sauf les fichiers qui existent vraiment (photos, api, etc.).
+Options -Indexes
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+RewriteRule ^ index.html [L]
+
+# index.html n'est jamais gardé en cache, pour que les mises à jour du site apparaissent tout de suite.
+<IfModule mod_headers.c>
+  <Files "index.html">
+    Header set Cache-Control "no-cache"
+  </Files>
+</IfModule>
